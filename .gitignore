@@ -1,3 +1,4 @@
 jenkins_service/jenkins_config/*
 !jenkins_service/jenkins_config/jobs/*
 *.pem
+syslog-ng_service/logging/*
