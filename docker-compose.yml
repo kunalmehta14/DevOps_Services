@@ -1,0 +1,111 @@
+version: '3.3'
+
+networks:
+  containerNetwork:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.50.60.0/28
+
+services:
+#Jenkins service
+  jenkins:
+      restart: always
+      container_name: jenkins_service
+      build:
+          context: ./jenkins_service/
+          dockerfile: Dockerfile
+      ports:
+          - "8080:8080"
+          - "50000:50000"
+          - "8070:22"
+      volumes:
+        - ./jenkins_service/jenkins_config:/root/.jenkins
+      networks:
+        containerNetwork:
+          ipv4_address: 10.50.60.2
+      privileged: true
+#Grafana Service
+  grafana:
+    container_name: grafana_service
+    restart: always
+    user: root
+    build:
+      context: ./grafana_service
+      dockerfile: Dockerfile
+    volumes:
+      - ./grafana_service/configuration:/etc/grafana
+      - ./grafana_service/dashboard:/var/lib/grafana
+    ports:
+      - "8065:22"
+      - "3000:3000"
+    networks:
+      containerNetwork:
+        ipv4_address: 10.50.60.3
+    privileged: true
+#Prometheus Service
+  prometheus:
+    container_name: prometheus_service
+    restart: always
+    build:
+      context: ./prometheus_service
+      dockerfile: Dockerfile
+    volumes:
+      - ./prometheus_service/configuration:/etc/prometheus/
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - "9090:9090"
+    networks:
+      containerNetwork:
+        ipv4_address: 10.50.60.4
+#Loki Service
+  loki:
+    container_name: loki_service
+    build:
+      context: ./loki_service
+      dockerfile: Dockerfile
+    volumes:
+      - ./loki_service/configuration:/etc/loki
+    restart: unless-stopped
+    command: -config.file=/etc/loki/loki-config.yml
+    networks:
+      containerNetwork:
+        ipv4_address: 10.50.60.5
+#Promtail service
+  promtail:
+    container_name: promtail_service
+    build:
+      context: ./promtail_service
+      dockerfile: Dockerfile    
+    restart: unless-stopped
+    volumes:
+      - ./syslog-ng_service/logging:/logs
+      - ./promtail_service/configuration:/etc/promtail
+    command: -config.file=/etc/promtail/promtail-config.yml 
+    networks:
+      containerNetwork:
+        ipv4_address: 10.50.60.6
+#Syslog-ng Service
+  syslog-ng:
+    container_name: syslog-ng_service
+    build:
+      context: ./syslog-ng_service
+      dockerfile: Dockerfile
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Canada/Eastern
+    volumes:
+      - ./syslog-ng_service/configuration:/config
+      - ./syslog-ng_service/logging:/var/log
+    ports:
+      - "514:5514/udp"
+      - "601:6601/tcp"
+      - "6514:6514/tcp"
+    restart: unless-stopped
+    networks:
+      containerNetwork:
+        ipv4_address: 10.50.60.7
+    privileged: true
