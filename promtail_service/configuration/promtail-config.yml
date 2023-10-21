@@ -15,3 +15,14 @@ scrape_configs:
       labels:
         job: syslog
         __path__: /logs/*log
+  # - job_name: hostlog
+  #   syslog:
+  #     listen_address: 0.0.0.0:1514
+  #     listen_protocol: tcp
+  #     idle_timeout: 60s
+  #     label_structured_data: yes
+  #     labels:
+  #       jobs: "host"
+  #   relabel_configs:
+  #     - source_labels: ['__syslog_message_hostname']
+  #       target_label: 'host

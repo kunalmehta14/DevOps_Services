@@ -80,6 +80,8 @@ services:
       context: ./promtail_service
       dockerfile: Dockerfile    
     restart: unless-stopped
+    ports:
+      - "1514:1514"
     volumes:
       - ./syslog-ng_service/logging:/logs
       - ./promtail_service/configuration:/etc/promtail

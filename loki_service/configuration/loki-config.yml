@@ -29,6 +29,6 @@ schema_config:
         prefix: index_
         period: 24h
 query_scheduler:
-  max_outstanding_requests_per_tenant: 2048
+  max_outstanding_requests_per_tenant: 1048
 # ruler:
 #   alertmanager_url: http://devopsserver.techfactory.com:9093

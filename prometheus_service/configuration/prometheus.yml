@@ -6,7 +6,15 @@ scrape_configs:
     scrape_interval: 5s
     static_configs:
       - targets: ['prometheus-target-1:9090']
-  - job_name: 'node_exporter_metrics'
+  - job_name: 'data_collector_metrics'
     scrape_interval: 5s
-    static_configs:
-      - targets: ['<src>:9323', '<src>:8080','<src>:9100']
+    static_configs: 
+      - targets: ['10.10.10.19:8080','10.10.10.19:9100']
+        labels:
+          machine_name: data_collector
+  - job_name: 'traefik_metrics'
+    scrape_interval: 5s
+    static_configs: 
+      - targets: ['10.10.10.3:8090','10.10.10.3:9100']
+        labels:
+          machine_name: traefik
